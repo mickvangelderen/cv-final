@@ -9,9 +9,23 @@ html
 		canvas#canvas
 
 		br
-		button#fill Fill with center value
-		button#normalize Normalize kernel sum
+		button#gauss Gaussian blur
+		button#edge Edge detector
+		button#invert Invert image
 
+		br
+		h4 Bias
+		button#bias-fill Fill with center value
+		button#bias-normalize Normalize sum
+		br
+		input.bias(type="text" value="0")
+		input.bias(type="text" value="0")
+		input.bias(type="text" value="0")
+
+		br
+		h4 Kernel
+		button#kernel-fill Fill with center value
+		button#kernel-normalize Normalize sum
 		br
 		input.kernel(type="text" value="0")
 		input.kernel(type="text" value="0")

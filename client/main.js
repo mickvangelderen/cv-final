@@ -7,6 +7,8 @@ $(document).ready(function() {
 	var vx_ptr = null;
 	var dim_ptr = null;
 	var kernel_ptr = null;
+	var bias_ptr = null;
+
 	var vx = null;
 	var ix = null;
 	var tex = null;
@@ -67,7 +69,9 @@ $(document).ready(function() {
 
 		dim_ptr = gl.getUniformLocation(program, "texSize");
 
-		kernel_ptr = gl.getUniformLocation(program, "kernel[0]");
+		kernel_ptr = gl.getUniformLocation(program, "kernel");
+
+		bias_ptr = gl.getUniformLocation(program, "bias");
 
 	}, function(error) {
 		console.error(error);
@@ -110,6 +114,45 @@ $(document).ready(function() {
 		console.error("Get User Media error", error);
 	});
 
+	var bias = [];
+	readBias();
+
+	function readBias() {
+		$('input.bias').each(function(index, element) {
+			bias[index] = 1.0*element.value;
+		});
+	};
+
+	function writeBias() {
+		$('input.bias').each(function(index, element) {
+			element.value = bias[index];
+		});
+	};
+
+	$('input.bias').change(readBias);
+
+	$('#bias-fill').click(function() {
+		readBias();
+		var value = bias[Math.floor(bias.length/2)];
+		for (var i = 0; i < bias.length; i++) {
+			bias[i] = value;
+		}
+		writeBias();
+	});
+
+	$('#bias-normalize').click(function() {
+		readBias();
+		var sum = 0;
+		for (var i = 0; i < bias.length; i++) {
+			sum += bias[i];
+		}
+		var scale = 1/sum;
+		for (var i = 0; i < bias.length; i++) {
+			bias[i] *= scale;
+		}
+		writeBias();
+	});
+
 	var kernel = [];
 	readKernel();
 
@@ -127,7 +170,7 @@ $(document).ready(function() {
 
 	$('input.kernel').change(readKernel);
 
-	$('#fill').click(function() {
+	$('#kernel-fill').click(function() {
 		readKernel();
 		var value = kernel[Math.floor(kernel.length/2)];
 		for (var i = 0; i < kernel.length; i++) {
@@ -136,7 +179,7 @@ $(document).ready(function() {
 		writeKernel();
 	});
 
-	$('#normalize').click(function() {
+	$('#kernel-normalize').click(function() {
 		readKernel();
 		var sum = 0;
 		for (var i = 0; i < kernel.length; i++) {
@@ -149,12 +192,51 @@ $(document).ready(function() {
 		writeKernel();
 	});
 
+	$('#gauss').click(function() {
+		bias = [0, 0, 0];
+		writeBias();
+		kernel = [
+			0.0000, 0.0000, 0.0002, 0.0000, 0.0000,
+			0.0000, 0.0113, 0.0837, 0.0113, 0.0000,
+			0.0002, 0.0837, 0.6187, 0.0837, 0.0002,
+			0.0000, 0.0113, 0.0837, 0.0113, 0.0000,
+			0.0000, 0.0000, 0.0002, 0.0000, 0.0000
+		];
+		writeKernel();
+	});
+
+	$('#edge').click(function() {
+		bias = [0.5, 0.5, 0.5];
+		writeBias();
+		kernel = [
+			   -0.0005, -0.0050, -0.0109, -0.0050, -0.0005,
+			   -0.0050, -0.0506, -0.0769, -0.0506, -0.0050,
+			   -0.0109, -0.0769,  0.5958, -0.0769, -0.0109,
+			   -0.0050, -0.0506, -0.0769, -0.0506, -0.0050,
+			   -0.0005, -0.0050, -0.0109, -0.0050, -0.0005
+		];
+		writeKernel();
+	});
+
+	$('#invert').click(function() {
+		bias = [1, 1, 1];
+		writeBias();
+		kernel = [
+			0, 0,  0, 0, 0,
+			0, 0,  0, 0, 0,
+			0, 0, -1, 0, 0,
+			0, 0,  0, 0, 0,
+			0, 0,  0, 0, 0
+		];
+		writeKernel();
+	});
 	function loop() {
 		gl.clear(gl.COLOR_BUFFER_BIT);
 
 		if (program && videoReady) {
 			gl.uniform2f(dim_ptr, gl.clientWidth, gl.clientHeight);
 			gl.uniform1fv(kernel_ptr, new Float32Array(kernel));
+			gl.uniform3fv(bias_ptr, new Float32Array(bias));
 			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, tex);
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, video);
