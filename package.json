@@ -4,8 +4,7 @@
   "description": "Computer Vision Final Project",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "pages": "gulp gh-pages:build && git subtree push --prefix build/ origin gh-pages"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
