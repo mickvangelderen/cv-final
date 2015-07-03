@@ -140,19 +140,6 @@ $(document).ready(function() {
 		writeBias();
 	});
 
-	$('#bias-normalize').click(function() {
-		readBias();
-		var sum = 0;
-		for (var i = 0; i < bias.length; i++) {
-			sum += bias[i];
-		}
-		var scale = 1/sum;
-		for (var i = 0; i < bias.length; i++) {
-			bias[i] *= scale;
-		}
-		writeBias();
-	});
-
 	var kernel = [];
 	readKernel();
 
@@ -179,18 +166,31 @@ $(document).ready(function() {
 		writeKernel();
 	});
 
-	$('#kernel-normalize').click(function() {
+	$('#normalize').click(function() {
 		readKernel();
-		var sum = 0;
+		var pos = 0;
+		var neg = 0;
 		for (var i = 0; i < kernel.length; i++) {
-			sum += kernel[i];
+			if (kernel[i] > 0) {
+				pos += kernel[i];
+			} else {
+				neg += kernel[i];
+			}
 		}
-		var scale = 1/sum;
+		console.log(pos, neg);
+		var a = 1/(pos - neg);
+		var b = -neg*a;
+		for (var i = 0; i < bias.length; i++) {
+			bias[i] = b;
+		}
+		writeBias();
 		for (var i = 0; i < kernel.length; i++) {
-			kernel[i] *= scale;
+			kernel[i] *= a;
 		}
 		writeKernel();
 	});
+
+	// Some predifined filters
 
 	$('#gauss').click(function() {
 		bias = [0, 0, 0];
@@ -230,6 +230,59 @@ $(document).ready(function() {
 		];
 		writeKernel();
 	});
+
+	$('#sobel-x').click(function() {
+		bias = [0.5, 0.5, 0.5];
+		writeBias();
+		kernel = [
+			0,  0, 0, 0, 0,
+			0, -1, 0, 1, 0,
+			0, -2, 0, 2, 0,
+			0, -1, 0, 1, 0,
+			0,  0, 0, 0, 0
+		];
+		writeKernel();
+	});
+
+	$('#sobel-y').click(function() {
+		bias = [0.5, 0.5, 0.5];
+		writeBias();
+		kernel = [
+			0,  0,  0,  0, 0,
+			0, -1, -2, -1, 0,
+			0,  0,  0,  0, 0,
+			0,  1,  2,  1, 0,
+			0,  0,  0,  0, 0
+		];
+		writeKernel();
+	});
+
+	$('#scharr-x').click(function() {
+		bias = [0.5, 0.5, 0.5];
+		writeBias();
+		kernel = [
+			0,  0,  0,  0, 0,
+			0, -3,  0,  3, 0,
+			0, -10, 0, 10, 0,
+			0, -3,  0,  3, 0,
+			0,  0,  0,  0, 0
+		];
+		writeKernel();
+	});
+
+	$('#scharr-y').click(function() {
+		bias = [0.5, 0.5, 0.5];
+		writeBias();
+		kernel = [
+			0,  0,   0,  0, 0,
+			0, -3, -10, -3, 0,
+			0,  0,   0,  0, 0,
+			0,  3,  10,  3, 0,
+			0,  0,   0,  0, 0
+		];
+		writeKernel();
+	});
+
 	function loop() {
 		gl.clear(gl.COLOR_BUFFER_BIT);
 

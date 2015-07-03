@@ -12,11 +12,17 @@ html
 		button#gauss Gaussian blur
 		button#edge Edge detector
 		button#invert Invert image
+		button#sobel-x Sobel X
+		button#sobel-y Sobel Y
+		button#scharr-x Scharr X
+		button#scharr-y Scharr Y
+
+		br
+		button#normalize Normalize filter output range
 
 		br
 		h4 Bias
 		button#bias-fill Fill with center value
-		button#bias-normalize Normalize sum
 		br
 		input.bias(type="text" value="0")
 		input.bias(type="text" value="0")
@@ -25,7 +31,6 @@ html
 		br
 		h4 Kernel
 		button#kernel-fill Fill with center value
-		button#kernel-normalize Normalize sum
 		br
 		input.kernel(type="text" value="0")
 		input.kernel(type="text" value="0")
