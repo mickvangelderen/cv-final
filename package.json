@@ -1,0 +1,24 @@
+{
+  "name": "cv-final",
+  "version": "0.1.0",
+  "description": "Computer Vision Final Project",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:mickvangelderen/cv-final"
+  },
+  "author": "Mick van Gelderen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mickvangelderen/cv-final/issues"
+  },
+  "homepage": "https://github.com/mickvangelderen/cv-final",
+  "dependencies": {
+    "express": "^4.13.0",
+    "jade": "^1.11.0",
+    "less-middleware": "^2.0.1"
+  }
+}
