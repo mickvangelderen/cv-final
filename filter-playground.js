@@ -1,8 +1,11 @@
 $(document).ready(function() {
 
+	var snapCanvas = $("#snap")[0];
+	var ctx = snapCanvas.getContext('2d')
+
 	// Get A WebGL context
-	var canvas = $("#canvas")[0];
-	var gl = canvas.getContext("experimental-webgl");
+	var glCanvas = $("#canvas")[0];
+	var gl = glCanvas.getContext('webgl') || glCanvas.getContext('experimental-webgl');
 	var program = null;
 	var vx_ptr = null;
 	var dim_ptr = null;
@@ -31,7 +34,7 @@ $(document).ready(function() {
 
 	// Load and compile shaders, link program and query program attributes.
 	$.when(
-		$.get('vertex.glsl').then(function(source) {
+		$.get('filter-playground-vertex.glsl').then(function(source) {
 			var shader = gl.createShader(gl.VERTEX_SHADER);
 			gl.shaderSource(shader, source);
 			gl.compileShader(shader);
@@ -40,7 +43,7 @@ $(document).ready(function() {
 			}
 			return shader;
 		}),
-		$.get('fragment.glsl').then(function(source) {
+		$.get('filter-playground-fragment.glsl').then(function(source) {
 			var shader = gl.createShader(gl.FRAGMENT_SHADER);
 			gl.shaderSource(shader, source);
 			gl.compileShader(shader);
@@ -84,8 +87,8 @@ $(document).ready(function() {
 	var videoReady = false;
 	video.oncanplay = function() {
 		videoReady = true;
-		gl.clientWidth = canvas.width = video.videoWidth;
-		gl.clientHeight = canvas.height = video.videoHeight;
+		gl.clientWidth = glCanvas.width = snapCanvas.width = video.videoWidth;
+		gl.clientHeight = glCanvas.height = snapCanvas.height = video.videoHeight;
 		gl.viewport(0, 0, gl.clientWidth, gl.clientHeight);
 	};
 
@@ -283,10 +286,27 @@ $(document).ready(function() {
 		writeKernel();
 	});
 
+	$('#download').click(function() {
+		var image = snapCanvas.toDataURL('image/png');
+		window.open(image);
+	});
+
+	tex2 = gl.createTexture();
+	gl.bindTexture(gl.TEXTURE_2D, tex2);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 640, 480, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+
+	var fb = gl.createFramebuffer();
+	gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex2, 0);
+	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
 	function loop() {
 		gl.clear(gl.COLOR_BUFFER_BIT);
 
 		if (program && videoReady) {
+
+			gl.useProgram(program);
+
 			gl.uniform2f(dim_ptr, gl.clientWidth, gl.clientHeight);
 			gl.uniform1fv(kernel_ptr, new Float32Array(kernel));
 			gl.uniform3fv(bias_ptr, new Float32Array(bias));
@@ -298,7 +318,32 @@ $(document).ready(function() {
 			gl.vertexAttribPointer(vx_ptr, 2, gl.FLOAT, false, 0, 0);
 
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ix);
+
+			gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
 			gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+
+			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+			gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+
+			if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) == gl.FRAMEBUFFER_COMPLETE) {
+
+				var pixels = new Uint8Array(4*640*480);
+				gl.readPixels(0, 0, 640, 480, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+
+				// for (var iy = 0; iy < 480; iy++) {
+				// 	for (var ix = 0; ix < 640; ix++) {
+				// 		var ip = 4*(iy*640 + ix);
+				// 		var r = pixels[ip + 0];
+				// 		pixels[ip + 0] = r;
+				// 		pixels[ip + 1] = r;
+				// 		pixels[ip + 2] = r;
+				// 		pixels[ip + 3] = r;
+				// 	}
+				// }
+				var imageData = ctx.createImageData(640, 480);
+				imageData.data.set(pixels);
+				ctx.putImageData(imageData, 0, 0);
+			}
 		}
 
 		window.requestAnimationFrame(loop);

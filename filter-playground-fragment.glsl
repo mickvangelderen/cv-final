@@ -9,7 +9,8 @@ varying vec2 texCoords;
 
 void main() {
 	vec2 d = vec2(1.0)/texSize;
-	gl_FragColor = vec4(bias, 1.0) + vec4(
+	gl_FragColor = vec4(
+		bias +
 		kernel[ 0]*vec3(texture2D(tex, texCoords + d*vec2(-2.0,  2.0))) +
 		kernel[ 1]*vec3(texture2D(tex, texCoords + d*vec2(-1.0,  2.0))) +
 		kernel[ 2]*vec3(texture2D(tex, texCoords + d*vec2( 0.0,  2.0))) +
