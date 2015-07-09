@@ -5,6 +5,6 @@ attribute vec2 vx;
 varying vec2 texCoords;
 
 void main() {
-	gl_Position = vec4(1.0 - 2.0*vx.x, 1.0 - 2.0*vx.y, 0, 1);
+	gl_Position = vec4(1.0 - 2.0*vx.x, 2.0*vx.y - 1.0, 0, 1);
 	texCoords = vx;
 }
