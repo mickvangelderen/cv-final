@@ -32,6 +32,6 @@ gulp.task('gh-pages:build', ['gh-pages:clean'], function(done) {
 		})
 })
 
-gulp.task('gh-pages', ['gh-pages:build'], function() {
+gulp.task('gh-pages:push', function() {
 	shell.exec('git subtree push --prefix gh-pages/ origin gh-pages')
 })
