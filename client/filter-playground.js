@@ -5,7 +5,7 @@ $(document).ready(function() {
 
 	// Get A WebGL context
 	var glCanvas = $("#canvas")[0];
-	var gl = glCanvas.getContext('experimental-webgl');
+	var gl = glCanvas.getContext('webgl') || glCanvas.getContext('experimental-webgl');
 	var program = null;
 	var vx_ptr = null;
 	var dim_ptr = null;
@@ -34,7 +34,7 @@ $(document).ready(function() {
 
 	// Load and compile shaders, link program and query program attributes.
 	$.when(
-		$.get('vertex.glsl').then(function(source) {
+		$.get('filter-playground-vertex.glsl').then(function(source) {
 			var shader = gl.createShader(gl.VERTEX_SHADER);
 			gl.shaderSource(shader, source);
 			gl.compileShader(shader);
@@ -43,7 +43,7 @@ $(document).ready(function() {
 			}
 			return shader;
 		}),
-		$.get('fragment.glsl').then(function(source) {
+		$.get('filter-playground-fragment.glsl').then(function(source) {
 			var shader = gl.createShader(gl.FRAGMENT_SHADER);
 			gl.shaderSource(shader, source);
 			gl.compileShader(shader);
