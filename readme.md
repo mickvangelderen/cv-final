@@ -1,6 +1,6 @@
 # Computer Vision - Final Project
 
-[INSERT PDF LINK HERE](../blob/master/cv-final.pdf)
+[Report](../blob/master/CV_Final_Project_Hand_Tracking.pdf)
 
 [Webcam & WebGL experiments](https://mickvangelderen.github.io/cv-final/)
 
