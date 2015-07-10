@@ -8,7 +8,7 @@ S = [ ...
     0.0269    0.0251    0.0272; ...
 ];
 
-T = 10;
+T = 30;
 
 pixels = reshape(image, [], 3);
 probs = mvnpdf(pixels, M, S) > T;

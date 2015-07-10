@@ -12,12 +12,15 @@ while cam.isvalid
     Idx = imfilter(Igray, hscharr);
     Idy = imfilter(Igray, hscharr');
     Idxy = abs(Idx) + abs(Idy);
-    skin = detect_skin(I);
-    Iedge = imfilter(skin.*Idxy, hblur);
+    Iskin = detect_skin(I);
+    Iedge = imfilter(Iskin.*Idxy, hblur);
+% Find local maxima
 %     Imax = Iedge > imdilate(Iedge, [1 1 1; 1 0 1; 1 1 1]);
 %     Idet = Iedge > 0.7 & Imax;
-    subplot(1, 2, 1); imshow(I);
-    subplot(1, 2, 2); imshow(Iedge);
+    subplot(2, 2, 1); imshow(I);
+    subplot(2, 2, 2); imshow(Idxy);
+    subplot(2, 2, 3); imshow(Iskin);
+    subplot(2, 2, 4); imshow(Iedge);
     
     B = I;
 end
